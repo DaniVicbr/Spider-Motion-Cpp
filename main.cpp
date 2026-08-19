@@ -2,7 +2,7 @@
 #include "raymath.h"
 
 //Defines
-#define SPIDER_BASE_SIZE	20.0f
+#define SPIDER_BASE_SIZE	15.0f
 #define SPIDER_SPEED		5.0f
 
 //Type and Structure
@@ -53,7 +53,7 @@ void InitGame(void)
 void UpdateGame(void)
 {
     float turnSpeed = 5.0f;  
-    float moveSpeed = 8.0f;  
+    float moveSpeed = 5.0f;  
     
     if (IsKeyDown(KEY_A)) spider.rotation -= turnSpeed;
     if (IsKeyDown(KEY_D)) spider.rotation += turnSpeed;
@@ -95,16 +95,28 @@ void DrawGame(void)
             spider.position.x + cosRot * (SPIDER_BASE_SIZE / 2.0f),
             spider.position.y + sinRot * (SPIDER_BASE_SIZE / 2.0f) 
         };
+
+        Vector2 spiderCephalothorax {
+            spider.position.x - sinRot * 16.0f,
+            spider.position.y + cosRot * 16.0f
+        };
+
+        Vector2 spiderAbdomen {
+            spider.position.x - sinRot * 45.0f,
+            spider.position.y + cosRot * 45.0f
+        };
 	
-		DrawTriangle(v1, v2, v3, MAROON);
-        DrawPoly((v1 + v2) / 2, 6, 20, 0.0f, MAROON);
+		DrawTriangle(v1, v2, v3, BROWN);
+        DrawPoly(spiderCephalothorax, 6, 20, 0.0f, BROWN);
+
+        DrawCircleV(spiderAbdomen, 25, BROWN);
  
 		DrawCircleV(v1, 3, BLUE);
 		DrawCircleV(v2, 3, GREEN);
 		DrawCircleV(v3, 3, GREEN);
 
         ClearBackground(BLACK);
-        DrawText("Use W,A,S,D para movimentação", 10, 10, 20, DARKGRAY);
+        DrawText("Use W,A,S,D para movimentação", 10, 10, 20, WHITE);
 
 	EndDrawing();
 }
