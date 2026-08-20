@@ -63,6 +63,7 @@ void UpdateGame(void)
     if (IsKeyDown(KEY_W)) {
         spider.position.x += sinf(rad) * moveSpeed;
         spider.position.y -= cosf(rad) * moveSpeed;
+        
     }
     if (IsKeyDown(KEY_S)) {
         spider.position.x -= sinf(rad) * moveSpeed;
@@ -74,8 +75,8 @@ void DrawGame(void)
 {
 	BeginDrawing();
 
-        for (int i = 0; i < screenWidth; i += 50) DrawLine(i, 0, i, screenHeight, LIGHTGRAY);
-		for (int i = 0; i < screenHeight; i += 50) DrawLine(0, i, screenWidth, i, LIGHTGRAY);
+        /*for (int i = 0; i < screenWidth; i += 50) DrawLine(i, 0, i, screenHeight, LIGHTGRAY);
+		for (int i = 0; i < screenHeight; i += 50) DrawLine(0, i, screenWidth, i, LIGHTGRAY);*/
              	
         float rad = spider.rotation * DEG2RAD;
         float sinRot = sinf(rad);
@@ -107,13 +108,13 @@ void DrawGame(void)
         };
 	
 		DrawTriangle(v1, v2, v3, BROWN);
-        DrawPoly(spiderCephalothorax, 6, 20, 0.0f, BROWN);
+        DrawPoly(spiderCephalothorax, 6, 20, spider.rotation, BROWN);
 
         DrawCircleV(spiderAbdomen, 25, BROWN);
  
-		DrawCircleV(v1, 3, BLUE);
+		/*DrawCircleV(v1, 3, BLUE);
 		DrawCircleV(v2, 3, GREEN);
-		DrawCircleV(v3, 3, GREEN);
+		DrawCircleV(v3, 3, GREEN);*/
 
         ClearBackground(BLACK);
         DrawText("Use W,A,S,D para movimentação", 10, 10, 20, WHITE);
