@@ -1,5 +1,8 @@
 #include "raylib.h"
 #include "raymath.h"
+#include <iostream>
+#include <vector> 
+
 
 //Defines
 #define SPIDER_BASE_SIZE	15.0f
@@ -9,6 +12,7 @@
 typedef struct Spider {
 	Vector2 position;
 	Vector2 speed;
+    Vector2 spiderCenter;
 	float acceleration;
 	float rotation; 
 	Vector3 collider;
@@ -20,6 +24,7 @@ static const int screenHeight = 600;
 static Spider spider = {};
 static float spiderHeight = 0.0f;
 /*static float spiderBase = 30.0f;*/
+static std::vector<Vector2> rastrov1;
 
 //Module Functions Declaration (local)
 static void UpdateGame(void);
@@ -47,13 +52,13 @@ void InitGame(void)
 	spider.position = (Vector2){(float)screenWidth/2, (float)screenHeight/2};
 	spider.speed = (Vector2){4.0f, 4.0f};
 	spider.rotation = 0.0f;
-	spiderHeight = (SPIDER_BASE_SIZE/2)/tanf(20*DEG2RAD);
+	spiderHeight = (SPIDER_BASE_SIZE/2)/tanf(20*DEG2RAD); 
 }
 
 void UpdateGame(void)
 {
     float turnSpeed = 5.0f;  
-    float moveSpeed = 5.0f;  
+    float moveSpeed = 3.0f;   
     
     if (IsKeyDown(KEY_A)) spider.rotation -= turnSpeed;
     if (IsKeyDown(KEY_D)) spider.rotation += turnSpeed;
@@ -74,6 +79,9 @@ void UpdateGame(void)
 void DrawGame(void) 
 {
 	BeginDrawing();
+
+        ClearBackground(BLACK);
+
 
         /*for (int i = 0; i < screenWidth; i += 50) DrawLine(i, 0, i, screenHeight, LIGHTGRAY);
 		for (int i = 0; i < screenHeight; i += 50) DrawLine(0, i, screenWidth, i, LIGHTGRAY);*/
@@ -112,12 +120,25 @@ void DrawGame(void)
 
         DrawCircleV(spiderAbdomen, 25, BROWN);
  
-		/*DrawCircleV(v1, 3, BLUE);
+		DrawCircleV(v1, 3, BLUE);
 		DrawCircleV(v2, 3, GREEN);
-		DrawCircleV(v3, 3, GREEN);*/
+		DrawCircleV(v3, 3, GREEN);
+       
+        //std::cout << "v1.x: "<<v1.x <<" | v2.y:"<<v1.y<< "\n";
+        
+        //Vector Tracking: 
+        rastrov1.push_back(v1);
+        if (rastrov1.size() > 100) {
+           rastrov1.erase(rastrov1.begin()); 
+        };
 
-        ClearBackground(BLACK);
+        for(int i = 0; i < rastrov1.size(); i++) {
+            DrawCircleV(rastrov1[i], 1, GREEN);
+        }
+
         DrawText("Use W,A,S,D para movimentação", 10, 10, 20, WHITE);
 
 	EndDrawing();
 }
+
+
