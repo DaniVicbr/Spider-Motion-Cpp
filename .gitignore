@@ -1,0 +1,10 @@
+# Arquivos temporários do editor (Vim / Swap)
+*.swp
+*.swo
+.*.swp
+
+# Executável do jogo compilado
+jogo
+
+# Arquivos temporários do macOS
+.DS_Store
