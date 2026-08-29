@@ -3,7 +3,6 @@
 #include <iostream>
 #include <vector> 
 
-
 //Defines
 #define SPIDER_BASE_SIZE	15.0f
 #define SPIDER_SPEED		5.0f
@@ -31,6 +30,8 @@ static void UpdateGame(void);
 static void InitGame(void);
 static void DrawGame(void);
 
+bool isWeb = false;
+
 //Main entry point
 int main(void) {
 	InitWindow(screenWidth, screenHeight, "Spider Simulator");
@@ -53,6 +54,7 @@ void InitGame(void)
 	spider.speed = (Vector2){4.0f, 4.0f};
 	spider.rotation = 0.0f;
 	spiderHeight = (SPIDER_BASE_SIZE/2)/tanf(20*DEG2RAD); 
+ 
 }
 
 void UpdateGame(void)
@@ -73,6 +75,9 @@ void UpdateGame(void)
         spider.position.x -= sinf(rad) * moveSpeed;
         spider.position.y += cosf(rad) * moveSpeed;
     }
+
+    isWeb = IsKeyDown(KEY_SPACE);
+    
 }
 
 void DrawGame(void) 
@@ -124,13 +129,20 @@ void DrawGame(void)
         };
 
           //Vector Tracking: 
-        rastrov1.emplace_back(webPoint);
-        if (rastrov1.size() > 250) {
-           rastrov1.erase(rastrov1.begin()); 
-        };
-
-        for(int i = 0; i < rastrov1.size(); i++) {
-            DrawCircleV(rastrov1[i], 4, WHITE);
+          
+         
+        if (isWeb) {
+            rastrov1.emplace_back(webPoint);
+            if (rastrov1.size() > 100) {
+                rastrov1.erase(rastrov1.begin());  
+            }
+        }
+        
+        if (rastrov1.size() > 1) {
+            for(int i = 0; i < (int)rastrov1.size() - 1; i++) {
+                //DrawCircleV(rastrov1[i], 4, WHITE);
+                DrawLineV(rastrov1[i], rastrov1[i+1], WHITE);
+            }
         }
 
 	
@@ -143,16 +155,16 @@ void DrawGame(void)
 		DrawCircleV(v2, 3, GREEN);
 		DrawCircleV(v3, 3, GREEN);
 
-        //Central Point starting from v1:
-        
+        //Central Point starting from v1: 
         DrawCircleV(centerSpider, 10, BLUE);
 
         DrawLineV(centerSpider, Vector2{(spider.position.x + cosRot) , (spider.position.y - sinRot)}, RED); 
        
         //std::cout << "v1.x: "<<v1.x <<" | v2.y:"<<v1.y<< "\n";
         
+        std::cout << "Web 37500/" << rastrov1.size() << "\n";
       
-        DrawText("Use W,A,S,D para movimentação", 10, 10, 20, WHITE);
+        DrawText("[W,A,S,D]: motion | [SPACE]: shoot webs", 10, 10, 20, WHITE);
 
 	EndDrawing();
 }
