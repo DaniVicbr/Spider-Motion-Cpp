@@ -58,13 +58,12 @@ void InitGame(void)
 void UpdateGame(void)
 {
     float turnSpeed = 5.0f;  
-    float moveSpeed = 3.0f;   
-    
+    float moveSpeed = 3.0f;
+    float rad = spider.rotation * DEG2RAD;
+
     if (IsKeyDown(KEY_A)) spider.rotation -= turnSpeed;
     if (IsKeyDown(KEY_D)) spider.rotation += turnSpeed;
-    
-    float rad = spider.rotation * DEG2RAD;
-    
+     
     if (IsKeyDown(KEY_W)) {
         spider.position.x += sinf(rad) * moveSpeed;
         spider.position.y -= cosf(rad) * moveSpeed;
@@ -81,7 +80,6 @@ void DrawGame(void)
 	BeginDrawing();
 
         ClearBackground(BLACK);
-
 
         /*for (int i = 0; i < screenWidth; i += 50) DrawLine(i, 0, i, screenHeight, LIGHTGRAY);
 		for (int i = 0; i < screenHeight; i += 50) DrawLine(0, i, screenWidth, i, LIGHTGRAY);*/
@@ -114,6 +112,27 @@ void DrawGame(void)
             spider.position.x - sinRot * 45.0f,
             spider.position.y + cosRot * 45.0f
         };
+
+        Vector2 centerSpider {
+            spider.position.x - sinRot * 33.0f,
+            spider.position.y + cosRot * 33.0f
+        };
+
+        Vector2 webPoint {
+            spider.position.x - sinRot * 63.0f,
+            spider.position.y + cosRot * 63.0f
+        };
+
+          //Vector Tracking: 
+        rastrov1.emplace_back(webPoint);
+        if (rastrov1.size() > 250) {
+           rastrov1.erase(rastrov1.begin()); 
+        };
+
+        for(int i = 0; i < rastrov1.size(); i++) {
+            DrawCircleV(rastrov1[i], 4, WHITE);
+        }
+
 	
 		DrawTriangle(v1, v2, v3, BROWN);
         DrawPoly(spiderCephalothorax, 6, 20, spider.rotation, BROWN);
@@ -123,19 +142,16 @@ void DrawGame(void)
 		DrawCircleV(v1, 3, BLUE);
 		DrawCircleV(v2, 3, GREEN);
 		DrawCircleV(v3, 3, GREEN);
+
+        //Central Point starting from v1:
+        
+        DrawCircleV(centerSpider, 10, BLUE);
+
+        DrawLineV(centerSpider, Vector2{(spider.position.x + cosRot) , (spider.position.y - sinRot)}, RED); 
        
         //std::cout << "v1.x: "<<v1.x <<" | v2.y:"<<v1.y<< "\n";
         
-        //Vector Tracking: 
-        rastrov1.push_back(v1);
-        if (rastrov1.size() > 100) {
-           rastrov1.erase(rastrov1.begin()); 
-        };
-
-        for(int i = 0; i < rastrov1.size(); i++) {
-            DrawCircleV(rastrov1[i], 1, GREEN);
-        }
-
+      
         DrawText("Use W,A,S,D para movimentação", 10, 10, 20, WHITE);
 
 	EndDrawing();
