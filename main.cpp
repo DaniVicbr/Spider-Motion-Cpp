@@ -5,9 +5,20 @@
 
 //Defines
 #define SPIDER_BASE_SIZE	15.0f
-#define SPIDER_SPEED		5.0f
+#define SPIDER_SPEED		10.0f
 
 //Type and Structure
+
+typedef struct SpiderLeg {
+    Vector2 footPoint;
+    Vector2 kneePoint;  
+    Vector2 rootPoint;
+    float legAngle; 
+    Vector2 currentFoot;
+    Vector2 targetFoot;
+    bool isMoving;
+} SpiderLeg;
+
 typedef struct Spider {
 	Vector2 position;
 	Vector2 speed;
@@ -15,6 +26,7 @@ typedef struct Spider {
 	float acceleration;
 	float rotation; 
 	Vector3 collider;
+    SpiderLeg legs[8];
 } Spider;
 
 //Global Variables Declaration
@@ -54,15 +66,28 @@ void InitGame(void)
 	spider.speed = (Vector2){4.0f, 4.0f};
 	spider.rotation = 0.0f;
 	spiderHeight = (SPIDER_BASE_SIZE/2)/tanf(20*DEG2RAD); 
- 
-}
+
+    //Spider legs angle:
+
+    spider.legs[0].legAngle = 30.0f;
+    spider.legs[1].legAngle = 70.0f;
+    spider.legs[2].legAngle = 110.0f;
+    spider.legs[3].legAngle = 150.0f;
+
+    spider.legs[4].legAngle = 330.0f;
+    spider.legs[5].legAngle = 290.0f;
+    spider.legs[6].legAngle = 250.0f;
+    spider.legs[7].legAngle = 210.0f;
+
+ }
 
 void UpdateGame(void)
 {
     float turnSpeed = 5.0f;  
     float moveSpeed = 3.0f;
     float rad = spider.rotation * DEG2RAD;
-
+    //float spiderLeg.legAngle; 
+   
     if (IsKeyDown(KEY_A)) spider.rotation -= turnSpeed;
     if (IsKeyDown(KEY_D)) spider.rotation += turnSpeed;
      
@@ -76,8 +101,7 @@ void UpdateGame(void)
         spider.position.y += cosf(rad) * moveSpeed;
     }
 
-    isWeb = IsKeyDown(KEY_SPACE);
-    
+    isWeb = IsKeyDown(KEY_SPACE); 
 }
 
 void DrawGame(void) 
@@ -86,13 +110,13 @@ void DrawGame(void)
 
         ClearBackground(BLACK);
 
-        /*for (int i = 0; i < screenWidth; i += 50) DrawLine(i, 0, i, screenHeight, LIGHTGRAY);
-		for (int i = 0; i < screenHeight; i += 50) DrawLine(0, i, screenWidth, i, LIGHTGRAY);*/
-             	
+        //for (int i = 0; i < screenWidth; i += 50) DrawLine(i, 0, i, screenHeight, LIGHTGRAY);
+		//for (int i = 0; i < screenHeight; i += 50) DrawLine(0, i, screenWidth, i, LIGHTGRAY);
+
         float rad = spider.rotation * DEG2RAD;
         float sinRot = sinf(rad);
         float cosRot = cosf(rad);
-
+        
         Vector2 v1 = {
             spider.position.x + sinRot * spiderHeight,
             spider.position.y - cosRot * spiderHeight
@@ -128,9 +152,34 @@ void DrawGame(void)
             spider.position.y + cosRot * 63.0f
         };
 
-          //Vector Tracking: 
-          
-         
+        //----------------------------------------------------------------------------------
+        // Spider Legs Drawing
+        //----------------------------------------------------------------------------------
+        
+        for (int i = 0; i < 8; i++) {
+
+            SpiderLeg& currentFoot = spider.legs[i];
+
+            float angleOffset = currentFoot.legAngle * DEG2RAD; 
+            float finalAngle = rad + angleOffset;
+
+            currentFoot.kneePoint.x = spiderCephalothorax.x + sinf(finalAngle) * 60.0f;
+            currentFoot.kneePoint.y = spiderCephalothorax.y - cosf(finalAngle) * 60.0f;
+
+            currentFoot.footPoint.x = spiderCephalothorax.x + sinf(finalAngle) * 120.0f;
+            currentFoot.footPoint.y = spiderCephalothorax.y - cosf(finalAngle) * 120.0f; 
+
+            DrawCircleV(currentFoot.kneePoint, 2, GREEN);
+            DrawCircleV(currentFoot.footPoint, 2, RED);
+            DrawLineV(centerSpider, currentFoot.kneePoint, BROWN);
+            DrawLineV(currentFoot.kneePoint, currentFoot.footPoint, BROWN);                
+        }
+        
+        //----------------------------------------------------------------------------------
+        //Web tracking: 
+        //----------------------------------------------------------------------------------
+
+           
         if (isWeb) {
             rastrov1.emplace_back(webPoint);
             if (rastrov1.size() > 100) {
@@ -144,25 +193,22 @@ void DrawGame(void)
                 DrawLineV(rastrov1[i], rastrov1[i+1], WHITE);
             }
         }
-
 	
 		DrawTriangle(v1, v2, v3, BROWN);
         DrawPoly(spiderCephalothorax, 6, 20, spider.rotation, BROWN);
 
         DrawCircleV(spiderAbdomen, 25, BROWN);
  
-		DrawCircleV(v1, 3, BLUE);
+		/*DrawCircleV(v1, 3, BLUE);
 		DrawCircleV(v2, 3, GREEN);
-		DrawCircleV(v3, 3, GREEN);
+		DrawCircleV(v3, 3, GREEN);*/
 
         //Central Point starting from v1: 
-        DrawCircleV(centerSpider, 10, BLUE);
-
-        DrawLineV(centerSpider, Vector2{(spider.position.x + cosRot) , (spider.position.y - sinRot)}, RED); 
+        //DrawCircleV(centerSpider, 10, BLUE);
        
         //std::cout << "v1.x: "<<v1.x <<" | v2.y:"<<v1.y<< "\n";
         
-        std::cout << "Web 37500/" << rastrov1.size() << "\n";
+        //std::cout << "Web 37500/" << rastrov1.size() << "\n";
       
         DrawText("[W,A,S,D]: motion | [SPACE]: shoot webs", 10, 10, 20, WHITE);
 
