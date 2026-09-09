@@ -13,9 +13,10 @@ typedef struct SpiderLeg {
     Vector2 footPoint;
     Vector2 kneePoint;  
     Vector2 rootPoint;
+    Vector2 targetFootPoint
+    Vector2 oldFootPoint;
     float legAngle; 
     Vector2 currentFoot;
-    Vector2 targetFoot;
     bool isMoving;
 } SpiderLeg;
 
@@ -78,12 +79,11 @@ void InitGame(void)
     spider.legs[5].legAngle = 290.0f;
     spider.legs[6].legAngle = 250.0f;
     spider.legs[7].legAngle = 210.0f;
-
  }
 
 void UpdateGame(void)
 {
-    float turnSpeed = 5.0f;  
+    float turnSpeed = 3.0f;  
     float moveSpeed = 3.0f;
     float rad = spider.rotation * DEG2RAD;
     //float spiderLeg.legAngle; 
@@ -93,8 +93,7 @@ void UpdateGame(void)
      
     if (IsKeyDown(KEY_W)) {
         spider.position.x += sinf(rad) * moveSpeed;
-        spider.position.y -= cosf(rad) * moveSpeed;
-        
+        spider.position.y -= cosf(rad) * moveSpeed; 
     }
     if (IsKeyDown(KEY_S)) {
         spider.position.x -= sinf(rad) * moveSpeed;
@@ -166,11 +165,12 @@ void DrawGame(void)
             currentFoot.kneePoint.x = spiderCephalothorax.x + sinf(finalAngle) * 60.0f;
             currentFoot.kneePoint.y = spiderCephalothorax.y - cosf(finalAngle) * 60.0f;
 
-            currentFoot.footPoint.x = spiderCephalothorax.x + sinf(finalAngle) * 120.0f;
-            currentFoot.footPoint.y = spiderCephalothorax.y - cosf(finalAngle) * 120.0f; 
+            currentFoot.footPoint.x = spiderCephalothorax.x + sinf(finalAngle) * 150.0f;
+            currentFoot.footPoint.y = spiderCephalothorax.y - cosf(finalAngle) * 150.0f; 
 
             DrawCircleV(currentFoot.kneePoint, 2, GREEN);
             DrawCircleV(currentFoot.footPoint, 2, RED);
+
             DrawLineV(centerSpider, currentFoot.kneePoint, BROWN);
             DrawLineV(currentFoot.kneePoint, currentFoot.footPoint, BROWN);                
         }
@@ -178,8 +178,7 @@ void DrawGame(void)
         //----------------------------------------------------------------------------------
         //Web tracking: 
         //----------------------------------------------------------------------------------
-
-           
+ 
         if (isWeb) {
             rastrov1.emplace_back(webPoint);
             if (rastrov1.size() > 100) {
@@ -194,7 +193,7 @@ void DrawGame(void)
             }
         }
 	
-		DrawTriangle(v1, v2, v3, BROWN);
+		DrawTriangle(v1, v2, v3, RED);
         DrawPoly(spiderCephalothorax, 6, 20, spider.rotation, BROWN);
 
         DrawCircleV(spiderAbdomen, 25, BROWN);
