@@ -13,11 +13,15 @@ typedef struct SpiderLeg {
     Vector2 footPoint;
     Vector2 kneePoint;  
     Vector2 rootPoint;
-    Vector2 targetFootPoint
+    Vector2 targetFootPoint;
     Vector2 oldFootPoint;
-    float legAngle; 
     Vector2 currentFoot;
+    float legAngle; 
+    float stepProgress;
+    bool isStepping;
     bool isMoving;
+    float footToTargetPoint;
+       
 } SpiderLeg;
 
 typedef struct Spider {
@@ -31,8 +35,8 @@ typedef struct Spider {
 } Spider;
 
 //Global Variables Declaration
-static const int screenWidth = 800;
-static const int screenHeight = 600;
+static const int screenWidth = 1280;
+static const int screenHeight = 720;
 static Spider spider = {};
 static float spiderHeight = 0.0f;
 /*static float spiderBase = 30.0f;*/
@@ -83,8 +87,8 @@ void InitGame(void)
 
 void UpdateGame(void)
 {
-    float turnSpeed = 3.0f;  
-    float moveSpeed = 3.0f;
+    float turnSpeed = 4.0f;  
+    float moveSpeed = 7.0f;
     float rad = spider.rotation * DEG2RAD;
     //float spiderLeg.legAngle; 
    
@@ -115,7 +119,7 @@ void DrawGame(void)
         float rad = spider.rotation * DEG2RAD;
         float sinRot = sinf(rad);
         float cosRot = cosf(rad);
-        
+              
         Vector2 v1 = {
             spider.position.x + sinRot * spiderHeight,
             spider.position.y - cosRot * spiderHeight
@@ -157,22 +161,62 @@ void DrawGame(void)
         
         for (int i = 0; i < 8; i++) {
 
-            SpiderLeg& currentFoot = spider.legs[i];
-
+            SpiderLeg& currentFoot = spider.legs[i]; 
+                       
             float angleOffset = currentFoot.legAngle * DEG2RAD; 
-            float finalAngle = rad + angleOffset;
+            float finalAngle = rad + angleOffset; 
+            float defaultRadius = 120.0f;
+                 
+            //currentFoot.kneePoint.x = centerSpider.x + sinf(finalAngle) * 60.0f;
+            //currentFoot.kneePoint.y = centerSpider.y - cosf(finalAngle) * 60.0f;
 
-            currentFoot.kneePoint.x = spiderCephalothorax.x + sinf(finalAngle) * 60.0f;
-            currentFoot.kneePoint.y = spiderCephalothorax.y - cosf(finalAngle) * 60.0f;
+            //currentFoot.footPoint.x = spiderCephalothorax.x + sinf(finalAngle) * 150.0f;
+            //currentFoot.footPoint.y = spiderCephalothorax.y - cosf(finalAngle) * 150.0f;
 
-            currentFoot.footPoint.x = spiderCephalothorax.x + sinf(finalAngle) * 150.0f;
-            currentFoot.footPoint.y = spiderCephalothorax.y - cosf(finalAngle) * 150.0f; 
+            Vector2 midPoint = {
+                (spiderCephalothorax.x + currentFoot.footPoint.x) / 2.0f,
+                (spiderCephalothorax.y + currentFoot.footPoint.y) / 2.0f
+            };
+            
+            currentFoot.kneePoint.x = midPoint.x + sinf(finalAngle) * 20.0f;
+            currentFoot.kneePoint.y = midPoint.y - cosf(finalAngle) * 20.0f;
 
-            DrawCircleV(currentFoot.kneePoint, 2, GREEN);
-            DrawCircleV(currentFoot.footPoint, 2, RED);
+            currentFoot.targetFootPoint.x = centerSpider.x + sinf(finalAngle) * defaultRadius;
+            currentFoot.targetFootPoint.y = centerSpider.y - cosf(finalAngle) * defaultRadius;
 
-            DrawLineV(centerSpider, currentFoot.kneePoint, BROWN);
-            DrawLineV(currentFoot.kneePoint, currentFoot.footPoint, BROWN);                
+            //DrawCircleV(currentFoot.kneePoint, 2, GREEN);
+            //DrawCircleV(currentFoot.targetFootPoint, 2, RED);
+
+            DrawLineV(spiderCephalothorax, currentFoot.kneePoint, BROWN);
+            DrawLineV(currentFoot.kneePoint, currentFoot.footPoint, BROWN);
+
+            if (currentFoot.isStepping == false) {
+                float distance = Vector2Distance(currentFoot.footPoint, currentFoot.targetFootPoint);
+
+                if (distance > 80.0f) {
+                    currentFoot.isStepping = true;
+
+                    currentFoot.oldFootPoint = currentFoot.footPoint;
+                    currentFoot.stepProgress = 0.0f;
+                }
+            }
+
+            if (currentFoot.isStepping == true) {
+                currentFoot.stepProgress += 0.1f;
+                
+                currentFoot.footPoint = Vector2Lerp(currentFoot.oldFootPoint, currentFoot.targetFootPoint, currentFoot.stepProgress);
+
+                 if (currentFoot.stepProgress >= 1.0) {
+                currentFoot.isStepping = false;
+                currentFoot.stepProgress = 1.0f;
+                 }
+            }
+ 
+            // TODO: Knee point trigonometric relations do find ideal kneePoint
+            
+            /*currentFoot.kneePoint.x =   
+            currentFoot.kneePoint.y = */ 
+
         }
         
         //----------------------------------------------------------------------------------
@@ -181,7 +225,7 @@ void DrawGame(void)
  
         if (isWeb) {
             rastrov1.emplace_back(webPoint);
-            if (rastrov1.size() > 100) {
+            if (rastrov1.size() > 60000) {
                 rastrov1.erase(rastrov1.begin());  
             }
         }
@@ -193,10 +237,13 @@ void DrawGame(void)
             }
         }
 	
-		DrawTriangle(v1, v2, v3, RED);
+		DrawTriangle(v1, v2, v3, BROWN);
         DrawPoly(spiderCephalothorax, 6, 20, spider.rotation, BROWN);
 
         DrawCircleV(spiderAbdomen, 25, BROWN);
+
+        //DrawCircleV(spiderCephalothorax, 3, BLUE);
+
  
 		/*DrawCircleV(v1, 3, BLUE);
 		DrawCircleV(v2, 3, GREEN);
