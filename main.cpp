@@ -98,8 +98,8 @@ void InitGame(void)
 
 void UpdateGame(void)
 {
-    float turnSpeed = 5.0f;  
-    float moveSpeed = 10.0f;
+    float turnSpeed = 4.0f;  
+    float moveSpeed = 7.0f;
     float rad = spider.rotation * DEG2RAD;
     //float spiderLeg.legAngle; 
 
@@ -194,11 +194,12 @@ void DrawGame(void)
         currentFoot.targetFootPoint.x = centerSpider.x + sinf(finalAngle) * defaultRadius;
         currentFoot.targetFootPoint.y = centerSpider.y - cosf(finalAngle) * defaultRadius;
 
-        //DrawCircleV(currentFoot.kneePoint, 2, GREEN);
+        DrawCircleV(currentFoot.kneePoint, 2, GREEN);
+        DrawCircleV(currentFoot.footPoint, 2, RED);
         //DrawCircleV(currentFoot.targetFootPoint, 2, RED);
 
-        DrawLineV(spiderCephalothorax, currentFoot.kneePoint, BROWN);
-        DrawLineV(currentFoot.kneePoint, currentFoot.footPoint, BROWN);
+        DrawLineV(spiderCephalothorax, currentFoot.kneePoint, BLUE);
+        DrawLineV(currentFoot.kneePoint, currentFoot.footPoint, BLUE);
 
         if (currentFoot.isStepping == false) {
             float distance = Vector2Distance(currentFoot.footPoint, currentFoot.targetFootPoint);
@@ -211,7 +212,7 @@ void DrawGame(void)
                 }
             }
 
-            if (distance > 50.0f && otherGroupLegWalking == false) {
+            if (distance > 80.0f && otherGroupLegWalking == false) {
                 for (int k = 0; k < 8; k++) {
                     if (spider.legs[k].group == currentFoot.group && spider.legs[k].isStepping == false) {
                         spider.legs[k].isStepping = true;
